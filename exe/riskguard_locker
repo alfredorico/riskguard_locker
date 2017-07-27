@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+require 'optparse'
+require 'riskguard_locker'
+
+parametros_locker = {ruby_version: '2.2'} # Defaults
+motores = RiskguardLocker::ParametrosRiskguardLocker.new.motores << 'riskguard' << 'lic' <<'all'
+OptionParser.new do |opts|
+  opts.banner = "Uso: riskguard_locker [parametros_locker]"
+
+  opts.on("-c CLIENTE", "Indicar cual cliente") do |cliente|
+    parametros_locker[:cliente] = cliente
+  end
+
+  opts.on("-a AMBIENTE", "Indicar cual cliente") do |ambiente|
+    parametros_locker[:ambiente] = ambiente
+  end
+
+  opts.on("-m", "--motores m1,m2,mN", Array, "Empaquetar gema(s) (o app base riskguard)") do |motores|
+    parametros_locker[:motores] = motores
+  end
+
+  opts.on("--[no-]lock", "Bloquar código fuente") do |boolean|
+    parametros_locker[:lock] = boolean
+  end
+
+  opts.on( '-rv', '--ruby-version OPT', ['2.2', '2.3', '2.4'], "Versión de ruby" ) do|ruby_version|
+    parametros_locker[:ruby_version] = ruby_version
+  end
+
+end.parse!
+
+unless parametros_locker.has_key?(:lock)
+  puts "Debe indicar --lock o --no-lock para cerrar o no cerrar el código con rubyencoder"
+  exit(1)
+end
+
+unless parametros_locker[:motores] and parametros_locker[:cliente] and parametros_locker[:ambiente]
+  puts "Debe indicar el motor (-m) el cliente (-c) el ambiente (-a)"
+  exit(1)
+end
+
+if (parametros_locker[:motores] - motores).any?
+  puts "El(los) motor(es): #{parametros_locker[:motores].join(' y ')}, no son válidos "
+  exit(1)
+end
+
+RiskguardLocker.lock(parametros_locker)

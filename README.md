@@ -8,10 +8,8 @@
 Add this line to your application's Gemfile:
 
 ```ruby
-gem install --local riskguard
-gem 'riskguard_locker'
+gem install --local riskguard_locker-0.1.0.gem
 ```
+And then execute at command line:
 
-And then execute:
-
-    $ bundle
+riskguard_locker -c demoriskguard -m all -a produccion --no-lock
